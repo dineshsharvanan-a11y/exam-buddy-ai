@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Buddy AI</title>
+<style>body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;max-width:700px;margin:0 auto;padding:24px 16px}
+textarea{width:100%;box-sizing:border-box;min-height:90px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;padding:12px;font-size:1rem}
+button{margin-top:12px;background:#3b82f6;color:white;border:none;border-radius:10px;padding:12px 20px;font-size:1rem}
+#answer{margin-top:24px;background:#1e293b;border-radius:10px;padding:16px;white-space:pre-wrap;display:none}
+.error{color:#f87171}</style></head>
+<body>
+<h1>📘 Exam Buddy AI</h1>
+<p>Ask any topic for government/PSU exam prep — get an explanation, a memory trick, and a practice question.</p>
+<textarea id="question" placeholder="e.g. Explain the Indian Parliament's law-making process"></textarea><br>
+<button id="askBtn" onclick="ask()">Ask Exam Buddy</button>
+<div id="answer"></div>
+<script>
+async function ask(){
+const q=document.getElementById('question').value.trim();
+const btn=document.getElementById('askBtn');
+const out=document.getElementById('answer');
+if(!q)return;
+btn.disabled=true;btn.innerText="Thinking...";
+out.style.display="block";out.className="";out.innerText="Generating your answer...";
+try{
+const res=await fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})});
+const data=await res.json();
+if(data.error){out.className="error";out.innerText="Error: "+data.error;}
+else{out.innerText=data.answer;}
+}catch(e){out.className="error";out.innerText="Request failed: "+e.message;}
+finally{btn.disabled=false;btn.innerText="Ask Exam Buddy";}
+}
+</script></body></html>
